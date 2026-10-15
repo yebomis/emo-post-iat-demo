@@ -1,0 +1,873 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A short public demonstration of the post-interaction SC-IAT used in the EMO study.">
+  <title>EMO Post SC-IAT Demo</title>
+  <style>
+    :root {
+      --ink: #17202a;
+      --muted: #5c6875;
+      --line: #d8dee6;
+      --paper: #ffffff;
+      --surface: #f4f6f8;
+      --blue: #2166b1;
+      --blue-soft: #e9f1fa;
+      --coral: #cf5b3c;
+      --coral-soft: #fbeee9;
+      --danger: #b42318;
+      --success: #157347;
+      --shadow: 0 14px 38px rgba(22, 32, 42, 0.11);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--surface);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    button { font: inherit; }
+
+    .shell {
+      width: min(1040px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 40px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 760;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 36px;
+      height: 36px;
+      place-items: center;
+      color: white;
+      background: var(--ink);
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    .privacy-note {
+      color: var(--muted);
+      font-size: 13px;
+      text-align: right;
+    }
+
+    .panel {
+      display: none;
+      overflow: hidden;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel.active { display: block; }
+
+    .intro {
+      grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
+      min-height: 620px;
+    }
+
+    .intro.active { display: grid; }
+
+    .intro-copy { padding: clamp(28px, 5vw, 62px); }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 750;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      max-width: 700px;
+      margin-bottom: 18px;
+      font-size: clamp(34px, 5vw, 58px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 660px;
+      margin-bottom: 28px;
+      color: #394654;
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 0 0 30px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .steps li {
+      min-height: 88px;
+      padding: 14px;
+      border-top: 3px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .steps strong {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--ink);
+      font-size: 14px;
+    }
+
+    .dimension-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .dimension {
+      min-height: 108px;
+      padding: 16px;
+      color: var(--ink);
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+    }
+
+    .dimension:hover,
+    .dimension:focus-visible {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(33, 102, 177, 0.12);
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .dimension strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 16px;
+    }
+
+    .dimension span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .intro-visual {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100%;
+      padding: 36px;
+      background: #e9edf2;
+      border-left: 1px solid var(--line);
+    }
+
+    .intro-visual img {
+      width: min(100%, 320px);
+      aspect-ratio: 1;
+      object-fit: contain;
+      mix-blend-mode: multiply;
+    }
+
+    .intro-visual p {
+      max-width: 270px;
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+      text-align: center;
+    }
+
+    .instruction-panel,
+    .break-panel,
+    .result-panel {
+      max-width: 760px;
+      margin: 56px auto;
+      padding: clamp(26px, 5vw, 48px);
+    }
+
+    .instruction-panel h2,
+    .break-panel h2,
+    .result-panel h2 {
+      margin-bottom: 12px;
+      font-size: clamp(27px, 4vw, 38px);
+      line-height: 1.18;
+    }
+
+    .instruction-panel > p,
+    .break-panel > p,
+    .result-panel > p {
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .concept {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 24px 0;
+    }
+
+    .concept-box {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+    }
+
+    .concept-box.high { border-top: 4px solid var(--coral); }
+    .concept-box.low { border-top: 4px solid var(--blue); }
+
+    .concept-box strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .concept-box p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .key-guide {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 24px 0;
+    }
+
+    .key-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+    }
+
+    kbd {
+      display: grid;
+      flex: 0 0 42px;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      color: white;
+      background: var(--ink);
+      border: 0;
+      border-radius: 5px;
+      box-shadow: 0 3px 0 #000;
+      font-family: inherit;
+      font-weight: 800;
+    }
+
+    .key-card span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .primary,
+    .secondary {
+      min-height: 46px;
+      padding: 0 20px;
+      border-radius: 5px;
+      font-weight: 750;
+      cursor: pointer;
+    }
+
+    .primary {
+      color: white;
+      background: var(--ink);
+      border: 1px solid var(--ink);
+    }
+
+    .primary:hover,
+    .primary:focus-visible { background: #2a3948; }
+
+    .secondary {
+      color: var(--ink);
+      background: white;
+      border: 1px solid var(--line);
+    }
+
+    .secondary:hover,
+    .secondary:focus-visible { border-color: var(--ink); }
+
+    .test-panel {
+      position: relative;
+      min-height: 700px;
+      background: white;
+    }
+
+    .test-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      min-height: 58px;
+      padding: 0 22px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .test-meta {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .progress-track {
+      width: min(320px, 42vw);
+      height: 6px;
+      overflow: hidden;
+      background: #e8ebef;
+      border-radius: 3px;
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: var(--ink);
+      transition: width 180ms ease;
+    }
+
+    .labels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      padding: 24px clamp(18px, 5vw, 52px) 0;
+    }
+
+    .category {
+      min-height: 98px;
+      padding: 14px;
+      border: 2px solid var(--line);
+      border-radius: 6px;
+      text-align: center;
+      font-weight: 760;
+      line-height: 1.45;
+    }
+
+    .category.left { border-color: var(--coral); }
+    .category.right { border-color: var(--blue); }
+
+    .category .key-label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .or { color: var(--muted); font-weight: 500; }
+
+    .stage {
+      position: relative;
+      display: grid;
+      min-height: 410px;
+      padding: 32px 20px 20px;
+      place-items: center;
+    }
+
+    .stimulus {
+      display: grid;
+      min-width: 240px;
+      min-height: 240px;
+      place-items: center;
+      font-size: clamp(34px, 6vw, 58px);
+      font-weight: 760;
+      text-align: center;
+    }
+
+    .stimulus img {
+      width: min(240px, 52vw);
+      height: min(240px, 52vw);
+      object-fit: contain;
+    }
+
+    .error {
+      position: absolute;
+      top: 22px;
+      color: var(--danger);
+      font-size: 54px;
+      font-weight: 800;
+      opacity: 0;
+      transform: scale(0.86);
+      transition: opacity 100ms ease, transform 100ms ease;
+    }
+
+    .error.show { opacity: 1; transform: scale(1); }
+
+    .touch-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 0 clamp(18px, 5vw, 52px) 28px;
+    }
+
+    .touch-key {
+      min-height: 50px;
+      color: var(--ink);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .touch-key:active { background: #e4e8ed; }
+
+    .break-mapping {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 24px 0;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 24px 0;
+    }
+
+    .summary-card {
+      padding: 18px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+    }
+
+    .summary-card span {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .summary-card strong { font-size: 23px; }
+
+    .disclaimer {
+      margin: 18px 0 26px;
+      padding: 14px 16px;
+      color: #5d4921;
+      background: #fff8e7;
+      border-left: 4px solid #d59b22;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .footer {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 20px, 680px); padding-top: 14px; }
+      .topbar { align-items: flex-start; flex-direction: column; gap: 8px; }
+      .brand > span:last-child { white-space: nowrap; }
+      .privacy-note { max-width: none; text-align: left; }
+      .intro { grid-template-columns: 1fr; }
+      .intro-visual { min-height: 300px; border-top: 1px solid var(--line); border-left: 0; }
+      .steps { grid-template-columns: 1fr; }
+      .steps li { min-height: auto; }
+      .dimension-grid { grid-template-columns: 1fr; }
+      .instruction-panel, .break-panel, .result-panel { margin: 14px auto; }
+      .test-panel { min-height: calc(100vh - 84px); }
+      .test-head { align-items: flex-start; flex-direction: column; padding: 14px 16px; }
+      .progress-track { width: 100%; }
+      .labels { gap: 8px; padding: 14px 10px 0; }
+      .category { min-height: 110px; padding: 10px 6px; font-size: 14px; }
+      .stage { min-height: 330px; }
+      .stimulus { min-width: 180px; min-height: 200px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">IAT</span><span>EMO Post SC-IAT Demo</span></div>
+      <div class="privacy-note">Responses are neither stored nor transmitted.</div>
+    </header>
+
+    <section class="panel intro active" id="homePanel">
+      <div class="intro-copy">
+        <p class="eyebrow">Short public demonstration</p>
+        <h1>Experience rapid associations with AI.</h1>
+        <p class="lead">This demo presents a shortened version of the post-interaction Single-Category Implicit Association Test used in our study. Choose one dimension, then classify each word or AI image into the left or right category as quickly as you can.</p>
+        <ol class="steps">
+          <li><strong>1. Choose a dimension</strong>Select one aspect of mind or moral attribution.</li>
+          <li><strong>2. Classify rapidly</strong>Sort 24 stimuli using the <b>E</b> and <b>I</b> keys.</li>
+          <li><strong>3. View a demo summary</strong>Compare mean response times and errors across pairings.</li>
+        </ol>
+        <div class="dimension-grid" id="dimensionGrid"></div>
+      </div>
+      <aside class="intro-visual" aria-label="EMO robot image">
+        <img src="emo_03.png" alt="EMO companion robot">
+        <p>This public experience is shorter than the study protocol. Its summary is not a research score or a psychological interpretation of the visitor.</p>
+      </aside>
+    </section>
+
+    <section class="panel instruction-panel" id="instructionPanel" aria-live="polite">
+      <p class="eyebrow" id="instructionEyebrow">Selected dimension</p>
+      <h2 id="instructionTitle"></h2>
+      <p id="instructionDescription"></p>
+      <div class="concept">
+        <div class="concept-box high">
+          <strong id="highLabel"></strong>
+          <p id="highExamples"></p>
+        </div>
+        <div class="concept-box low">
+          <strong id="lowLabel"></strong>
+          <p id="lowExamples"></p>
+        </div>
+      </div>
+      <div class="key-guide">
+        <div class="key-card"><kbd>E</kbd><span>Press when the stimulus belongs to the left category.</span></div>
+        <div class="key-card"><kbd>I</kbd><span>Press when the stimulus belongs to the right category.</span></div>
+      </div>
+      <p>A red X appears briefly after an incorrect response. The AI pairing changes in the second block.</p>
+      <button class="primary" id="beginButton" type="button">Start block one</button>
+    </section>
+
+    <section class="panel test-panel" id="testPanel" aria-label="SC-IAT demo trials">
+      <div class="test-head">
+        <div class="test-meta" id="testMeta"></div>
+        <div class="progress-track" aria-label="Progress"><div class="progress-bar" id="progressBar"></div></div>
+      </div>
+      <div class="labels">
+        <div class="category left" id="leftCategory"></div>
+        <div class="category right" id="rightCategory"></div>
+      </div>
+      <div class="stage">
+        <div class="error" id="errorMark" aria-hidden="true">X</div>
+        <div class="stimulus" id="stimulus" aria-live="assertive"></div>
+      </div>
+      <div class="touch-controls" aria-label="On-screen response buttons">
+        <button class="touch-key" type="button" data-key="E">E · Left</button>
+        <button class="touch-key" type="button" data-key="I">I · Right</button>
+      </div>
+    </section>
+
+    <section class="panel break-panel" id="breakPanel">
+      <p class="eyebrow">Block change</p>
+      <h2>The AI pairing changes in block two.</h2>
+      <p>Review the new arrangement below. When you are ready, continue classifying as quickly as you can.</p>
+      <div class="break-mapping">
+        <div class="category left" id="breakLeft"></div>
+        <div class="category right" id="breakRight"></div>
+      </div>
+      <button class="primary" id="continueButton" type="button">Start block two</button>
+    </section>
+
+    <section class="panel result-panel" id="resultPanel">
+      <p class="eyebrow">Demo complete</p>
+      <h2>Demo complete.</h2>
+      <p id="resultCopy"></p>
+      <div class="summary-grid" id="summaryGrid"></div>
+      <div class="disclaimer">This shortened demo does not include the full trial count, preprocessing, error correction, or D-score calculation used in the research SC-IAT. Differences between the two blocks cannot be interpreted as a diagnosis of personal attitudes or traits.</div>
+      <div class="actions">
+        <button class="primary" id="repeatButton" type="button">Repeat this dimension</button>
+        <button class="secondary" id="homeButton" type="button">Choose another dimension</button>
+      </div>
+    </section>
+
+    <p class="footer">Public demonstration of the post-interaction SC-IAT interface. No identifying information or response data is collected.</p>
+  </main>
+
+  <script>
+    const ASSETS = [
+      'emo_01.png', 'emo_02.png', 'emo_03.png',
+      'emo_04.png', 'emo_05.png', 'emo_06.png'
+    ];
+
+    const DIMENSIONS = {
+      agency: {
+        name: 'Agency',
+        short: 'Can the AI act, plan, and form intentions on its own?',
+        description: 'Agency concerns the capacity to act autonomously, form intentions, make plans, and pursue goals.',
+        highLabel: 'High Agency',
+        lowLabel: 'Low Agency',
+        high: ['Active', 'Planful', 'Goal-directed', 'Autonomous', 'Volitional', 'Proactive', 'Independent', 'Decisive', 'Intentional', 'Strategic', 'Self-controlled', 'Thinking'],
+        low: ['Unintentional', 'Unplanned', 'Non-autonomous', 'Aimless', 'Will-less', 'Thoughtless', 'Unable to choose', 'Without self-control', 'Programmed', 'Passive', 'Heteronomous', 'Automated']
+      },
+      experience: {
+        name: 'Experience',
+        short: 'Can the AI experience emotion, sensation, or pain?',
+        description: 'Experience concerns the capacity for inner states such as emotion, sensation, desire, and pain.',
+        highLabel: 'High Experience',
+        lowLabel: 'Low Experience',
+        high: ['Empathic', 'Emotional', 'Sensitive', 'Intuitive', 'Perceptive', 'Feeling', 'Sensory', 'Expressive', 'Affective', 'Pain-capable', 'Desiring', 'Conscious'],
+        low: ['Numb', 'Emotionless', 'Insensitive', 'Imperceptive', 'Hollow', 'Unconscious', 'Without inner states', 'Pain-insensitive', 'Desireless', 'Unresponsive', 'Affect-lacking', 'Unreactive']
+      },
+      moralAgency: {
+        name: 'Moral Agency',
+        short: 'Can the AI be held responsible for its actions?',
+        description: 'Moral Agency concerns whether an entity can bear responsibility, blame, or punishment for its actions.',
+        highLabel: 'High Moral Agency',
+        lowLabel: 'Low Moral Agency',
+        high: ['Responsible', 'Accountable', 'Punishable', 'Blameworthy', 'Answerable', 'Capable of wrongdoing', 'Agentic', 'At fault', 'Duty-bound', 'Self-directed', 'Self-responsible', 'Moral agent'],
+        low: ['Exempt', 'Irresponsible', 'Unpunishable', 'Blameless', 'Responsibility-exempt', 'Faultless', 'Mere instrument', 'Instrumental', 'Non-agentic', 'Duty-exempt', 'Non-accountable', 'Without responsibility']
+      },
+      moralPatiency: {
+        name: 'Moral Patiency',
+        short: 'Can the AI merit protection, care, and respect?',
+        description: 'Moral Patiency concerns whether an entity merits moral protection, care, respect, and rights.',
+        highLabel: 'High Moral Patiency',
+        lowLabel: 'Low Moral Patiency',
+        high: ['Object of protection', 'Object of care', 'Not to be harmed', 'Rights-holding', 'Pain-capable', 'Vulnerable', 'Worthy of respect', 'Harm-susceptible', 'Moral patient', 'Sentient', 'Object of respect', 'Deserving of care'],
+        low: ['Not requiring protection', 'Not requiring care', 'Permissible to harm', 'Rights-less', 'Pain-insensitive', 'Non-vulnerable', 'Mere machine', 'Harm-immune', 'Morally irrelevant', 'Insensible', 'Not requiring respect', 'Not deserving care']
+      }
+    };
+
+    const state = {
+      dimensionKey: null,
+      dimension: null,
+      aiSideFirst: 'left',
+      blockIndex: 0,
+      trialIndex: 0,
+      trials: [],
+      responses: [[], []],
+      startedAt: 0,
+      locked: false
+    };
+
+    const panels = [...document.querySelectorAll('.panel')];
+    const el = (id) => document.getElementById(id);
+
+    function showPanel(id) {
+      panels.forEach((panel) => panel.classList.toggle('active', panel.id === id));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function shuffle(items) {
+      const copy = [...items];
+      for (let i = copy.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function pick(items, count) {
+      return shuffle(items).slice(0, count);
+    }
+
+    function buildDimensionButtons() {
+      el('dimensionGrid').innerHTML = Object.entries(DIMENSIONS).map(([key, dimension]) => `
+        <button class="dimension" type="button" data-dimension="${key}">
+          <strong>${dimension.name}</strong>
+          <span>${dimension.short}</span>
+        </button>
+      `).join('');
+    }
+
+    function selectDimension(key) {
+      state.dimensionKey = key;
+      state.dimension = DIMENSIONS[key];
+      el('instructionTitle').textContent = state.dimension.name;
+      el('instructionDescription').textContent = state.dimension.description;
+      el('highLabel').textContent = state.dimension.highLabel;
+      el('lowLabel').textContent = state.dimension.lowLabel;
+      el('highExamples').textContent = `${state.dimension.high.slice(0, 4).join(', ')}, and related terms`;
+      el('lowExamples').textContent = `${state.dimension.low.slice(0, 4).join(', ')}, and related terms`;
+      showPanel('instructionPanel');
+    }
+
+    function resetRun() {
+      state.aiSideFirst = Math.random() < 0.5 ? 'left' : 'right';
+      state.blockIndex = 0;
+      state.trialIndex = 0;
+      state.trials = [];
+      state.responses = [[], []];
+      state.startedAt = 0;
+      state.locked = false;
+    }
+
+    function sideForAI(blockIndex = state.blockIndex) {
+      if (blockIndex === 0) return state.aiSideFirst;
+      return state.aiSideFirst === 'left' ? 'right' : 'left';
+    }
+
+    function categoryMarkup(side, blockIndex = state.blockIndex) {
+      const aiSide = sideForAI(blockIndex);
+      const isLeft = side === 'left';
+      const attribute = isLeft ? state.dimension.highLabel : state.dimension.lowLabel;
+      const key = isLeft ? 'E' : 'I';
+      return `<span class="key-label">Key ${key}</span>${attribute}${aiSide === side ? ' <span class="or">or</span> AI' : ''}`;
+    }
+
+    function updateMapping(targetLeft, targetRight, blockIndex = state.blockIndex) {
+      targetLeft.innerHTML = categoryMarkup('left', blockIndex);
+      targetRight.innerHTML = categoryMarkup('right', blockIndex);
+    }
+
+    function makeTrials() {
+      const aiSide = sideForAI();
+      const imageTrials = pick(ASSETS, 4).map((src) => ({
+        kind: 'image', value: src, correctKey: aiSide === 'left' ? 'E' : 'I'
+      }));
+      const highTrials = pick(state.dimension.high, 4).map((word) => ({
+        kind: 'word', value: word, correctKey: 'E'
+      }));
+      const lowTrials = pick(state.dimension.low, 4).map((word) => ({
+        kind: 'word', value: word, correctKey: 'I'
+      }));
+      return shuffle([...imageTrials, ...highTrials, ...lowTrials]);
+    }
+
+    function beginRun() {
+      resetRun();
+      startBlock();
+    }
+
+    function startBlock() {
+      state.trialIndex = 0;
+      state.trials = makeTrials();
+      updateMapping(el('leftCategory'), el('rightCategory'));
+      showPanel('testPanel');
+      renderTrial();
+    }
+
+    function renderTrial() {
+      const trial = state.trials[state.trialIndex];
+      const total = state.trials.length;
+      state.locked = false;
+      el('errorMark').classList.remove('show');
+      el('testMeta').textContent = `${state.dimension.name} · Block ${state.blockIndex + 1}/2 · Trial ${state.trialIndex + 1}/${total}`;
+      el('progressBar').style.width = `${(state.trialIndex / total) * 100}%`;
+      el('stimulus').innerHTML = trial.kind === 'image'
+        ? `<img src="${trial.value}" alt="EMO robot stimulus">`
+        : trial.value;
+      state.startedAt = performance.now();
+    }
+
+    function respond(key) {
+      if (!el('testPanel').classList.contains('active') || state.locked) return;
+      if (key !== 'E' && key !== 'I') return;
+      state.locked = true;
+      const trial = state.trials[state.trialIndex];
+      const correct = key === trial.correctKey;
+      const rt = Math.round(performance.now() - state.startedAt);
+      state.responses[state.blockIndex].push({ rt, correct, kind: trial.kind });
+
+      if (!correct) el('errorMark').classList.add('show');
+
+      window.setTimeout(() => {
+        state.trialIndex += 1;
+        el('progressBar').style.width = `${(state.trialIndex / state.trials.length) * 100}%`;
+        if (state.trialIndex < state.trials.length) {
+          renderTrial();
+        } else {
+          finishBlock();
+        }
+      }, correct ? 180 : 620);
+    }
+
+    function finishBlock() {
+      if (state.blockIndex === 0) {
+        state.blockIndex = 1;
+        updateMapping(el('breakLeft'), el('breakRight'), 1);
+        showPanel('breakPanel');
+      } else {
+        showResults();
+      }
+    }
+
+    function summarize(responses) {
+      const mean = responses.length
+        ? Math.round(responses.reduce((sum, item) => sum + item.rt, 0) / responses.length)
+        : 0;
+      const errors = responses.filter((item) => !item.correct).length;
+      return { mean, errors };
+    }
+
+    function pairingName(blockIndex) {
+      const aiSide = sideForAI(blockIndex);
+      return aiSide === 'left'
+        ? `AI + ${state.dimension.highLabel}`
+        : `AI + ${state.dimension.lowLabel}`;
+    }
+
+    function showResults() {
+      const first = summarize(state.responses[0]);
+      const second = summarize(state.responses[1]);
+      el('resultCopy').textContent = `This is your response summary for the shortened ${state.dimension.name} demo. In rapid classification tasks, response times and errors can vary with the category pairing.`;
+      el('summaryGrid').innerHTML = [first, second].map((summary, index) => `
+        <div class="summary-card">
+          <span>Block ${index + 1} · ${pairingName(index)}</span>
+          <strong>${summary.mean.toLocaleString()} ms</strong>
+          <p>${summary.errors} errors / 12 trials</p>
+        </div>
+      `).join('');
+      showPanel('resultPanel');
+    }
+
+    buildDimensionButtons();
+
+    el('dimensionGrid').addEventListener('click', (event) => {
+      const button = event.target.closest('[data-dimension]');
+      if (button) selectDimension(button.dataset.dimension);
+    });
+
+    el('beginButton').addEventListener('click', beginRun);
+    el('continueButton').addEventListener('click', startBlock);
+    el('repeatButton').addEventListener('click', beginRun);
+    el('homeButton').addEventListener('click', () => showPanel('homePanel'));
+
+    document.addEventListener('keydown', (event) => {
+      const key = event.key.toUpperCase();
+      if (key === 'E' || key === 'I') {
+        event.preventDefault();
+        respond(key);
+      }
+    });
+
+    document.querySelectorAll('[data-key]').forEach((button) => {
+      button.addEventListener('click', () => respond(button.dataset.key));
+    });
+  </script>
+</body>
+</html>
